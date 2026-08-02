@@ -3,7 +3,7 @@
   
   # ADrop
 
-  **Ultra-fast offline local file transfer for Windows — up to 150+ MB/s over WiFi.**
+  **Ultra-fast offline local file transfer for Windows - up to 150+ MB/s over WiFi.**
 
   [![Version](https://img.shields.io/badge/version-v2.0.0-blue.svg?style=for-the-badge)](https://github.com/BeginnerAman/ADrop/releases)
   [![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg?style=for-the-badge&logo=windows)](https://github.com/BeginnerAman/ADrop)
@@ -11,7 +11,7 @@
   [![GitHub stars](https://img.shields.io/github/stars/BeginnerAman/ADrop.svg?style=for-the-badge&logo=github)](https://github.com/BeginnerAman/ADrop/stargazers)
   [![Downloads](https://img.shields.io/github/downloads/BeginnerAman/ADrop/total.svg?style=for-the-badge)](https://github.com/BeginnerAman/ADrop/releases)
 
-  ### *Transfer files between your phone and PC — no internet, no cables, no apps to install.*
+  ### *Transfer files between your phone and PC - no internet, no cables, no apps to install.*
 </div>
 
 ---
@@ -34,13 +34,13 @@
 | Feature | Description |
 | :--- | :--- |
 | **Instant Local Transfer** | Transfer at up to 150+ MB/s over WiFi with zero throttling. No internet needed. Works over WiFi, Mobile Hotspot, or USB Tethering. |
-| **QR Code Connection** | Just scan the QR code with your phone's camera. No app installation needed — works in any mobile browser. |
+| **QR Code Connection** | Just scan the QR code with your phone's camera. No app installation needed - works in any mobile browser. |
 | **Smart Clipboard Sharing** | Share text instantly between devices. Auto-detects URLs, phone numbers, OTPs, and email addresses with one-tap Smart Action chips. |
 | **Media Streaming & Preview** | Preview videos, images, audio, PDFs and documents directly in browser. Full video seeking support with HTTP Range Requests. |
 | **Resumable Uploads** | Large file transfers resume automatically if interrupted. Never start from scratch. |
 | **PIN Protection** | Optional PIN code security to restrict access. |
 | **Batch ZIP Download** | Select multiple files or download all files as a single ZIP archive. |
-| **RAM-Safe Streaming** | Constant memory usage regardless of file size. Processes files in 2-4 MB chunks — tested with multi-GB files. |
+| **RAM-Safe Streaming** | Constant memory usage regardless of file size. Processes files in 2-4 MB chunks - tested with multi-GB files. |
 | **Installable PWA** | Install ADrop on your phone's home screen for instant access. Works offline with Service Worker caching. |
 | **Zero-Copy Local Sharing** | Share files directly from any drive on your PC without copying. Files stream from their original location. |
 | **Auto-Configuration** | Auto-detects network IP, creates Windows Firewall rules, opens browser automatically. Just double-click and go. |
@@ -122,5 +122,5 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-  <b>Built with ❤️ by Aman</b>
+  <b>Built with ❤️ by Aman Vishwakarma</b>
 </div>
