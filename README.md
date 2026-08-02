@@ -80,16 +80,16 @@
 
 ### Mobile Interface
 
-<table>
+<table width="100%">
   <tr>
-    <td align="center"><img src="docs/images/mobile-main-ui.jpg" alt="Mobile Main UI" width="200"><br><sup>Main Interface</sup></td>
-    <td align="center"><img src="docs/images/mobile-file-list.jpg" alt="Mobile File List" width="200"><br><sup>File List</sup></td>
-    <td align="center"><img src="docs/images/mobile-upload-complete.jpg" alt="Upload Complete" width="200"><br><sup>Upload Complete</sup></td>
+    <td align="center" width="33%"><img src="docs/images/mobile-main-ui.jpg" alt="Mobile Main UI" width="100%"><br><sup>Main Interface</sup></td>
+    <td align="center" width="33%"><img src="docs/images/mobile-file-list.jpg" alt="Mobile File List" width="100%"><br><sup>File List</sup></td>
+    <td align="center" width="33%"><img src="docs/images/mobile-upload-complete.jpg" alt="Upload Complete" width="100%"><br><sup>Upload Complete</sup></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/images/mobile-smart-clipboard.jpg" alt="Smart Clipboard" width="200"><br><sup>Smart Clipboard</sup></td>
-    <td align="center"><img src="docs/images/mobile-otp-detect.jpg" alt="OTP Detection" width="200"><br><sup>OTP Auto-Detect</sup></td>
-    <td align="center"><img src="docs/images/mobile-diagnostics.jpg" alt="Diagnostics" width="200"><br><sup>System Diagnostics</sup></td>
+    <td align="center" width="33%"><img src="docs/images/mobile-smart-clipboard.jpg" alt="Smart Clipboard" width="100%"><br><sup>Smart Clipboard</sup></td>
+    <td align="center" width="33%"><img src="docs/images/mobile-otp-detect.jpg" alt="OTP Detection" width="100%"><br><sup>OTP Auto-Detect</sup></td>
+    <td align="center" width="33%"><img src="docs/images/mobile-diagnostics.jpg" alt="Diagnostics" width="100%"><br><sup>System Diagnostics</sup></td>
   </tr>
 </table>
 
