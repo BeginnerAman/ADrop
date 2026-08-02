@@ -491,61 +491,65 @@ a {
     font-size: 0.95rem;
 }
 
-/* Screenshots Gallery */
-.screenshots-grid {
+/* Stats / Why ADrop Section */
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
 }
 
-.screenshot-item {
-    position: relative;
+.stat-card {
+    padding: 32px 24px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 10px 40px rgba(124, 58, 237, 0.1);
+}
+
+.stat-icon {
+    margin-bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 16px;
-    overflow: hidden;
-    padding: 8px;
-    transition: var(--transition);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
-.screenshot-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
+.stat-icon i,
+.stat-icon svg {
+    width: 28px;
+    height: 28px;
+    color: #7c3aed;
 }
 
-.screenshot-item img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    display: block;
-    object-fit: cover;
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    background: linear-gradient(135deg, #7c3aed, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.screenshot-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    font-weight: 600;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: var(--transition);
+.stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-weight: 500;
 }
 
-.screenshot-item:hover .screenshot-caption {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Desktop shots span more columns */
-.screenshot-item:not(.mobile-shot) {
-    grid-column: span 8;
-}
-
-/* Mobile shots span fewer columns */
-.screenshot-item.mobile-shot {
-    grid-column: span 4;
+.stat-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
 }
 
 /* Download Comparison */
@@ -666,12 +670,8 @@ a {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .screenshot-item:not(.mobile-shot) {
-        grid-column: span 12;
-    }
-    
-    .screenshot-item.mobile-shot {
-        grid-column: span 6;
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -721,8 +721,8 @@ a {
         grid-template-columns: 1fr;
     }
     
-    .screenshot-item.mobile-shot {
-        grid-column: span 12;
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
     
     .footer-content {
