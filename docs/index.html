@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ADrop - Transfer files between your phone and PC without internet. Just connect to the same WiFi/Hotspot and scan a QR code.">
+    <meta name="author" content="Aman">
+    <meta property="og:title" content="ADrop - Offline Local File Transfer">
+    <meta property="og:description" content="Transfer files instantly between PC and Phone via WiFi. No apps, no internet.">
+    <title>ADrop | Offline Local File Transfer</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Background Animated Blobs -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="navbar" class="glass-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="images/adrop-logo.jpg" alt="ADrop Logo" class="nav-logo">
+                <span class="nav-title">ADrop</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#screenshots">Screenshots</a>
+                <a href="#download" class="nav-btn">Download</a>
+                <a href="https://github.com/BeginnerAman/ADrop" target="_blank" class="github-btn">
+                    <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    <span>Star on GitHub</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="container hero-content fade-up">
+            <div class="hero-logo-wrapper">
+                <img src="images/adrop-logo.jpg" alt="ADrop Logo" class="hero-logo">
+            </div>
+            <h1 class="hero-title">ADrop</h1>
+            <p class="hero-tagline">Transfer files between your phone and PC — no internet, no cables, no apps to install.</p>
+            <p class="hero-subtitle">v2.0.0 &middot; Windows &middot; Free &amp; Open Source</p>
+            
+            <div class="hero-buttons">
+                <a href="https://github.com/BeginnerAman/ADrop/releases/latest/download/ADrop.exe" class="btn btn-primary">
+                    <span class="btn-icon">⬇</span> Download Installer (.exe)
+                </a>
+                <a href="https://github.com/BeginnerAman/ADrop/releases/latest/download/ADrop-Portable.zip" class="btn btn-secondary">
+                    <span class="btn-icon">📦</span> Download Portable (.zip)
+                </a>
+            </div>
+            <p class="hero-note">Windows 10/11 &middot; ~18 MB &middot; No installation needed for Portable version</p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="section-title fade-up">Everything you need, nothing you don't</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card glass-panel fade-up">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Local Transfer</h3>
+                    <p class="feature-desc">Full LAN speed directly over your network. No internet connection required.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-1">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">QR Code Connect</h3>
+                    <p class="feature-desc">Just scan and go! No companion app needed on your mobile device.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-2">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Smart Clipboard</h3>
+                    <p class="feature-desc">Auto-detects URLs, phone numbers, and OTPs for quick copying.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up">
+                    <div class="feature-icon">🎬</div>
+                    <h3 class="feature-title">Media Preview</h3>
+                    <p class="feature-desc">Stream videos, listen to audio, and view images right in your browser.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-1">
+                    <div class="feature-icon">⏩</div>
+                    <h3 class="feature-title">Resumable Uploads</h3>
+                    <p class="feature-desc">Interrupted connection? ADrop automatically resumes your transfers.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-2">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">PIN Protection</h3>
+                    <p class="feature-desc">Optional security layer to keep your transfers completely private.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up">
+                    <div class="feature-icon">📦</div>
+                    <h3 class="feature-title">Batch ZIP Download</h3>
+                    <p class="feature-desc">Download multiple files or entire folders instantly as a ZIP archive.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-1">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">RAM-Safe Engine</h3>
+                    <p class="feature-desc">Constant memory usage, extensively tested with multi-gigabyte files.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-2">
+                    <div class="feature-icon">📲</div>
+                    <h3 class="feature-title">Installable PWA</h3>
+                    <p class="feature-desc">Add ADrop to your phone's home screen for a native app-like experience.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up">
+                    <div class="feature-icon">🖥️</div>
+                    <h3 class="feature-title">Zero-Copy Sharing</h3>
+                    <p class="feature-desc">Stream files directly from their original location without duplication.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-1">
+                    <div class="feature-icon">⚙️</div>
+                    <h3 class="feature-title">Auto-Setup</h3>
+                    <p class="feature-desc">Firewall rules, browser launching, and IP detection handled automatically.</p>
+                </div>
+                <div class="feature-card glass-panel fade-up delay-2">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Real-Time Sync</h3>
+                    <p class="feature-desc">WebSocket integration for instantaneous updates across devices.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section">
+        <div class="container">
+            <h2 class="section-title fade-up">How it works</h2>
+            
+            <div class="steps-container fade-up">
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Download &amp; Run</h3>
+                    <p class="step-desc">Double-click ADrop.exe on your PC. No complex installation required.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Scan QR Code</h3>
+                    <p class="step-desc">Use your phone's camera to scan the QR code displayed on your screen.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Transfer Files</h3>
+                    <p class="step-desc">Drag, drop, done! Access files both ways instantly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section id="screenshots" class="section">
+        <div class="container">
+            <h2 class="section-title fade-up">See it in action</h2>
+            
+            <div class="screenshots-grid">
+                <div class="screenshot-item glass-panel fade-up">
+                    <img src="images/desktop-dashboard.png" alt="Desktop Dashboard" loading="lazy">
+                    <div class="screenshot-caption">Main Dashboard &amp; QR</div>
+                </div>
+                <div class="screenshot-item glass-panel fade-up delay-1">
+                    <img src="images/desktop-file-list.png" alt="File List" loading="lazy">
+                    <div class="screenshot-caption">File Browser &amp; Management</div>
+                </div>
+                <div class="screenshot-item mobile-shot glass-panel fade-up delay-2">
+                    <img src="images/mobile-main-ui.jpg" alt="Mobile UI" loading="lazy">
+                    <div class="screenshot-caption">Mobile Interface</div>
+                </div>
+                
+                <div class="screenshot-item glass-panel fade-up">
+                    <img src="images/desktop-smart-clipboard.png" alt="Smart Clipboard" loading="lazy">
+                    <div class="screenshot-caption">Smart Clipboard Sync</div>
+                </div>
+                <div class="screenshot-item mobile-shot glass-panel fade-up delay-1">
+                    <img src="images/mobile-smart-clipboard.jpg" alt="Mobile Clipboard" loading="lazy">
+                    <div class="screenshot-caption">Mobile Clipboard &amp; OTPs</div>
+                </div>
+                <div class="screenshot-item mobile-shot glass-panel fade-up delay-2">
+                    <img src="images/mobile-upload-complete.jpg" alt="Mobile Upload Complete" loading="lazy">
+                    <div class="screenshot-caption">Fast &amp; Reliable Uploads</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="section">
+        <div class="container">
+            <h2 class="section-title fade-up">Choose your version</h2>
+            
+            <div class="download-grid">
+                <div class="download-card glass-panel fade-up">
+                    <div class="download-header">
+                        <h3>Installer</h3>
+                        <span class="badge">Recommended</span>
+                    </div>
+                    <div class="download-details">
+                        <div class="detail-row"><span>File:</span> <strong>ADrop.exe</strong></div>
+                        <div class="detail-row"><span>Size:</span> <strong>~18 MB</strong></div>
+                        <div class="detail-row"><span>Format:</span> <strong>Single file</strong></div>
+                        <div class="detail-row"><span>Features:</span> <strong>Auto firewall setup</strong></div>
+                    </div>
+                    <p class="download-desc">Best for regular use on your personal PC. Automatically configures firewall rules for seamless connection.</p>
+                    <a href="https://github.com/BeginnerAman/ADrop/releases/latest/download/ADrop.exe" class="btn btn-primary btn-full">Download Installer</a>
+                </div>
+                
+                <div class="download-card glass-panel fade-up delay-1">
+                    <div class="download-header">
+                        <h3>Portable</h3>
+                    </div>
+                    <div class="download-details">
+                        <div class="detail-row"><span>File:</span> <strong>ADrop-Portable.zip</strong></div>
+                        <div class="detail-row"><span>Size:</span> <strong>~18 MB</strong></div>
+                        <div class="detail-row"><span>Format:</span> <strong>ZIP Archive</strong></div>
+                        <div class="detail-row"><span>Features:</span> <strong>No installation</strong></div>
+                    </div>
+                    <p class="download-desc">Run directly from a USB drive or specific folder. Leaves no trace on the system. Perfect for work PCs.</p>
+                    <a href="https://github.com/BeginnerAman/ADrop/releases/latest/download/ADrop-Portable.zip" class="btn btn-secondary btn-full">Download Portable</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer glass-panel">
+        <div class="container footer-content">
+            <div class="footer-left">
+                <img src="images/adrop-logo.jpg" alt="ADrop Logo" class="footer-logo">
+                <div class="footer-info">
+                    <strong>ADrop v2.0.0</strong>
+                    <span>Free &amp; Open Source</span>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>Built with ❤️ by Aman</p>
+                <a href="https://github.com/BeginnerAman/ADrop" target="_blank" class="footer-link">GitHub Repository</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar scroll effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Intersection Observer for fade-up animations
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-up').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

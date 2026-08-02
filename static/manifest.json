@@ -1,0 +1,33 @@
+{
+  "name": "ADrop — Offline File Transfer",
+  "short_name": "ADrop",
+  "description": "Ultra-fast offline file sharing between mobile and PC via Hotspot or USB Tethering.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "icons": [
+    {
+      "src": "/static/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Upload File",
+      "short_name": "Upload",
+      "description": "Quickly upload a file",
+      "url": "/"
+    }
+  ]
+}

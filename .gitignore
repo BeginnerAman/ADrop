@@ -1,0 +1,32 @@
+# Protect Source Code (Keep Secret & Private)
+server/
+tests/
+.context/
+.pytest_cache/
+__pycache__/
+*.py
+*.pyc
+requirements.txt
+*.spec
+.coverage
+
+# Build artifacts (released via GitHub Releases, not tracked in repo)
+dist/ADrop.exe
+dist/ADrop-Portable.zip
+dist/ADrop_Portable/
+dist/ADrop_Portable/*
+dist/Downloads/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Virtual environment
+venv/
+.venv/
+virtual_registry.json
