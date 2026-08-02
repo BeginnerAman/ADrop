@@ -55,9 +55,9 @@
 
 ## Quick Start
 
-1. **Download** — Get `ADrop.exe` (Installer) or `ADrop-Portable.zip` (Portable) from the [Releases](https://github.com/BeginnerAman/ADrop/releases).
-2. **Run** — Double-click `ADrop.exe`. It auto-opens your browser and shows a QR code.
-3. **Connect** — Scan the QR code with your phone. Start transferring files instantly!
+1. **Download** - Get `ADrop.exe` (Installer) or `ADrop-Portable.zip` (Portable) from the [Releases](https://github.com/BeginnerAman/ADrop/releases).
+2. **Run** - Double-click `ADrop.exe`. It auto-opens your browser and shows a QR code.
+3. **Connect** - Scan the QR code with your phone. Start transferring files instantly!
 
 ## Screenshots
 
@@ -122,5 +122,5 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-  <b>Built with love by Aman</b>
+  <b>Built with ❤️ by Aman</b>
 </div>
