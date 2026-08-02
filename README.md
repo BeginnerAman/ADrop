@@ -3,7 +3,7 @@
   
   # ADrop
 
-  **Ultra-fast, offline local file transfer app for Windows.**
+  **Ultra-fast offline local file transfer for Windows — up to 150+ MB/s over WiFi.**
 
   [![Version](https://img.shields.io/badge/version-v2.0.0-blue.svg?style=for-the-badge)](https://github.com/BeginnerAman/ADrop/releases)
   [![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg?style=for-the-badge&logo=windows)](https://github.com/BeginnerAman/ADrop)
@@ -33,7 +33,7 @@
 
 | Feature | Description |
 | :--- | :--- |
-| **Instant Local Transfer** | Share files between PC and mobile at full LAN speed. No internet needed. Works over WiFi, Mobile Hotspot, or USB Tethering. |
+| **Instant Local Transfer** | Transfer at up to 150+ MB/s over WiFi with zero throttling. No internet needed. Works over WiFi, Mobile Hotspot, or USB Tethering. |
 | **QR Code Connection** | Just scan the QR code with your phone's camera. No app installation needed — works in any mobile browser. |
 | **Smart Clipboard Sharing** | Share text instantly between devices. Auto-detects URLs, phone numbers, OTPs, and email addresses with one-tap Smart Action chips. |
 | **Media Streaming & Preview** | Preview videos, images, audio, PDFs and documents directly in browser. Full video seeking support with HTTP Range Requests. |
