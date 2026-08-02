@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Ultra-lightweight offline local file sharing between mobile and PC via Hotspot or USB Tethering.">
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="color-scheme" content="dark">
+    <!-- V2 PWA Meta Tags (Task 3) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ADrop">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/logo.png?v=2">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/logo.png?v=2">
+    <title>ADrop - Offline File Transfer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Connection Status Bar -->
+    <header class="status-bar" id="status-bar" role="status" aria-live="polite">
+        <div class="status-bar-inner">
+            <span class="status-dot" id="status-dot" aria-hidden="true"></span>
+            <span class="status-text" id="status-text">Connecting...</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <section class="header" aria-label="Application header">
+            <h1 id="logo" style="cursor: pointer; user-select: none;">ADrop</h1>
+            <p class="subtitle">Offline Local File Transfer</p>
+        </section>
+
+        <!-- Connection Card -->
+        <section class="glass-card connection-card" id="connection-card" aria-label="Connection Info">
+            <div class="connection-layout">
+                <div class="qr-code-wrapper">
+                    <img id="qr-code-img" src="/qr" alt="Scan to connect" class="qr-code-image">
+                </div>
+                <div class="connection-text-wrapper">
+                    <h2>Connect Your Devices</h2>
+                    <p class="connection-desc">Scan the QR code or enter the URL below on your mobile browser:</p>
+                    <div class="connection-url-container">
+                        <span class="connection-url" id="connection-url-text">Detecting IP...</span>
+                        <button type="button" class="inline-copy-btn" id="copy-url-btn" title="Copy connection URL" aria-label="Copy connection URL">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clipboard Sharing Card -->
+        <section class="glass-card clipboard-card" aria-label="Clipboard Sharing">
+            <h2>Shared Clipboard</h2>
+            <div class="clipboard-input-wrapper">
+                <textarea id="clipboard-textarea" placeholder="Type or paste text to share instantly..."></textarea>
+                <button id="clipboard-share-btn" class="glass-btn primary-btn" title="Share Text">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+            </div>
+            
+            <!-- Shared Content Display -->
+            <div id="shared-text-display-container" class="shared-text-container hidden">
+                <div class="shared-text-header">
+                    <span class="shared-text-title">Shared Text</span>
+                    <div class="shared-text-actions">
+                        <button id="clipboard-copy-btn" class="glass-btn secondary-btn compact-btn" title="Copy text to clipboard">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Copy
+                        </button>
+                        <button id="clipboard-clear-btn" class="glass-btn danger-btn compact-btn" title="Clear shared text">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Clear
+                        </button>
+                    </div>
+                </div>
+                <!-- Large text warning notice card -->
+                <div id="clipboard-warning-card" class="warning-card hidden">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="warning-icon"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <div class="warning-info">
+                        <h4>Large Text Stream Guard</h4>
+                        <p>This payload exceeds 50,000 characters. To prevent browser memory lag, text rendering has been paused.</p>
+                        <div class="warning-actions">
+                            <button id="clipboard-download-btn" class="glass-btn danger-btn">Download .txt</button>
+                            <button id="clipboard-copy-anyway-btn" class="glass-btn secondary-btn">Copy Anyway</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Raw text display element -->
+                <pre id="shared-text-content" class="shared-text-raw"></pre>
+                
+                <!-- Smart Chips Container -->
+                <div id="smart-chips-container" class="smart-chips-wrapper hidden">
+                    <span class="chips-title">Smart Actions:</span>
+                    <div id="smart-chips-list" class="smart-chips-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upload Zone -->
+        <section class="glass-card upload-zone" id="upload-zone"
+                 role="button" tabindex="0"
+                 aria-label="File upload area. Click or drag files here to upload.">
+            <input type="file" id="file-input" class="hidden" multiple
+                   aria-hidden="true" tabindex="-1">
+            <div class="upload-icon" id="upload-icon" aria-hidden="true">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 6L24 32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M16 14L24 6L32 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 28V36C8 38.2091 9.79086 40 12 40H36C38.2091 40 40 38.2091 40 36V28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <p class="upload-text" id="upload-text">Drag &amp; drop files here</p>
+            <p class="upload-hint">or</p>
+            <button type="button" class="glass-btn primary-btn upload-btn" id="browse-btn">Browse Files</button>
+            <p class="upload-meta">Supports any file type</p>
+        </section>
+
+        <!-- Transfer Progress -->
+        <section class="glass-card progress-section" id="progress-section"
+                 role="progressbar" aria-label="File transfer progress"
+                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-header">
+                <span class="progress-filename" id="progress-filename">--</span>
+                <span class="progress-percent" id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <div class="progress-stats">
+                <span class="progress-stat" id="progress-transferred">0 B / 0 B</span>
+                <span class="progress-stat-separator" aria-hidden="true"></span>
+                <span class="progress-stat" id="progress-speed">--</span>
+                <span class="progress-stat-separator" aria-hidden="true"></span>
+                <span class="progress-stat" id="progress-eta">--</span>
+            </div>
+        </section>
+
+        <!-- File Directory Table -->
+        <section class="glass-card file-table-section" aria-label="Available files for download">
+            <div class="file-table-header">
+                <h2>Available Files</h2>
+                <div class="file-table-actions">
+                    <!-- Task 10: Multi-select toggle -->
+                    <button type="button" class="glass-btn secondary-btn compact-btn" id="select-toggle-btn" title="Select multiple files">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 4"/></svg>
+                        Select
+                    </button>
+                    <!-- Task 9: Download All button -->
+                    <button type="button" class="glass-btn secondary-btn compact-btn" id="download-all-btn" title="Download all files as ZIP">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        ZIP All
+                    </button>
+                </div>
+            </div>
+            <!-- Task 10: Multi-select action bar (hidden until active) -->
+            <div class="multi-select-bar hidden" id="multi-select-bar">
+                <span id="select-count-label">0 selected</span>
+                <div class="multi-select-actions">
+                    <button type="button" class="glass-btn secondary-btn compact-btn" id="select-all-btn">Select All</button>
+                    <button type="button" class="glass-btn danger-btn compact-btn" id="delete-selected-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        Delete Selected
+                    </button>
+                </div>
+            </div>
+            <ul class="file-list" id="file-list" role="list">
+                <!-- V2: Skeleton loading placeholders (shown during initial load) -->
+                <li class="file-item skeleton-item" aria-hidden="true">
+                    <span class="file-icon skeleton-box"></span>
+                    <div class="file-info"><span class="skeleton-line skeleton-line-long"></span><span class="skeleton-line skeleton-line-short"></span></div>
+                    <span class="file-actions"><span class="skeleton-box skeleton-btn"></span><span class="skeleton-box skeleton-btn"></span></span>
+                </li>
+                <li class="file-item skeleton-item" aria-hidden="true">
+                    <span class="file-icon skeleton-box"></span>
+                    <div class="file-info"><span class="skeleton-line skeleton-line-long"></span><span class="skeleton-line skeleton-line-short"></span></div>
+                    <span class="file-actions"><span class="skeleton-box skeleton-btn"></span><span class="skeleton-box skeleton-btn"></span></span>
+                </li>
+                <li class="file-item skeleton-item" aria-hidden="true">
+                    <span class="file-icon skeleton-box"></span>
+                    <div class="file-info"><span class="skeleton-line skeleton-line-long"></span><span class="skeleton-line skeleton-line-short"></span></div>
+                    <span class="file-actions"><span class="skeleton-box skeleton-btn"></span><span class="skeleton-box skeleton-btn"></span></span>
+                </li>
+            </ul>
+            <div class="file-list-footer" id="file-list-footer">
+                <span id="file-count">0 files</span>
+                <span class="footer-separator" aria-hidden="true"></span>
+                <span id="file-total-size">0 B total</span>
+            </div>
+        </section>
+
+        <!-- V2 Phase 4: Transfer History Dashboard (Task 8) -->
+        <section class="glass-card transfer-history-section" aria-label="Transfer History">
+            <div class="file-table-header">
+                <h2>Transfer History</h2>
+                <button type="button" class="glass-btn secondary-btn compact-btn hidden" id="clear-history-btn" title="Clear all transfer history">
+                    Clear
+                </button>
+            </div>
+            <ul class="history-list" id="transfer-history-list">
+                <li class="empty-msg">No transfers yet.</li>
+            </ul>
+        </section>
+
+        <footer class="footer">
+            <p class="footer-text">ADrop v2.0.0 &nbsp;·&nbsp; Offline Ready</p>
+        </footer>
+
+    </main>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+        <div class="modal-content glass-card">
+            <h3 id="confirm-title" class="modal-title">Confirm Action</h3>
+            <p id="confirm-message" class="modal-message">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button id="confirm-cancel" class="glass-btn secondary-btn">Cancel</button>
+                <button id="confirm-ok" class="glass-btn danger-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- V2 Phase 3: File Preview Modal (Tasks 4, 5, 6) -->
+    <div id="preview-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+        <div class="modal-content glass-card preview-card">
+            <div class="preview-header">
+                <span class="preview-filename" id="preview-title">--</span>
+                <div class="preview-header-actions">
+                    <button id="preview-download-btn" class="glass-btn secondary-btn compact-btn" title="Download file">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        Download
+                    </button>
+                    <button id="preview-close-btn" class="glass-btn secondary-btn compact-btn" aria-label="Close preview">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="preview-body" id="preview-body">
+                <!-- Content injected by JS depending on file type -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Credit Modal (Easter Egg) -->
+    <div id="credits-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="credits-title" aria-describedby="credits-desc">
+        <div class="modal-content glass-card credits-card">
+            <button type="button" id="credits-close" class="credits-close-btn" aria-label="Close" title="Close modal">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="credits-header">
+                <div class="credits-logo-wrapper">
+                    <img src="/static/logo.png?v=2" class="credits-logo-img" alt="ADrop Logo">
+                </div>
+                <h3 id="credits-title" class="modal-title credits-modal-title">System Diagnostics</h3>
+                <span class="credits-version-tag">ADrop Core Engine</span>
+            </div>
+            
+            <div class="metrics-grid" id="credits-desc">
+                <div class="metric-item">
+                    <span class="metric-label">Server Port</span>
+                    <span class="metric-value" id="term-port">8080</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Engine State</span>
+                    <span class="metric-value" id="term-stream">Ready</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Active Sharing</span>
+                    <span class="metric-value" id="term-active">0 Streams</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Device Link</span>
+                    <span class="metric-value" id="term-ws">Connected</span>
+                </div>
+            </div>
+            
+            <div class="developer-profile-card">
+                <span class="developer-label">DESIGNED &amp; DEVELOPED BY</span>
+                <div class="developer-identity">
+                    <span class="developer-name">Aman</span>
+                </div>
+                
+                <div class="credits-socials">
+                    <a href="https://github.com/BeginnerAman" target="_blank" rel="noopener noreferrer" class="social-icon" title="GitHub (BeginnerAman)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/amanv-data" target="_blank" rel="noopener noreferrer" class="social-icon" title="LinkedIn (amanv-data)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                    </a>
+                    <a href="https://www.instagram.com/amanvishwakarma0027" target="_blank" rel="noopener noreferrer" class="social-icon" title="Instagram (@amanvishwakarma0027)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
