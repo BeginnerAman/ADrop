@@ -1,7 +1,7 @@
 <div align="center">
   <img src="docs/images/adrop-logo.png" alt="ADrop Logo" width="150" style="border-radius: 20px;">
   
-  # ADrop
+  # ADrop - Ultra Fast Offline Local File Sharing App for PC & Mobile
 
   **Ultra-fast offline local file transfer for Windows - up to 150+ MB/s over WiFi.**
 
@@ -11,7 +11,7 @@
   [![GitHub stars](https://img.shields.io/github/stars/BeginnerAman/ADrop.svg?style=for-the-badge&logo=github)](https://github.com/BeginnerAman/ADrop/stargazers)
   [![Downloads](https://img.shields.io/github/downloads/BeginnerAman/ADrop/total.svg?style=for-the-badge)](https://github.com/BeginnerAman/ADrop/releases)
 
-  ### *Transfer files between your phone and PC - no internet, no cables, no apps to install.*
+  ### *The ultimate AirDrop alternative for Windows - transfer files between phone and PC with zero internet, zero cables, and no mobile app installation.*
 </div>
 
 ---
@@ -124,3 +124,12 @@ This project is licensed under the [MIT License](LICENSE).
 <div align="center">
   <b>Built with ❤️ by Aman Vishwakarma</b>
 </div>
+
+<!-- 
+=========================================
+SEO METADATA FOR SEARCH INDEXING:
+Name: ADrop
+Developer: Aman Vishwakarma (BeginnerAman)
+Keywords: ADrop, ADrop file sharing, AirDrop alternative for Windows, AirDrop for Windows, offline file transfer app, PC to mobile file transfer, WiFi file sharing, ShareIt alternative, local peer to peer file transfer, QR code file transfer, RAM safe binary streaming, Windows file sharing tool.
+=========================================
+-->
