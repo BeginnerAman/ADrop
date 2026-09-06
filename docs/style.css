@@ -439,6 +439,84 @@ a {
     font-size: 0.95rem;
 }
 
+/* Connection Prerequisite Box */
+.connection-prereq {
+    max-width: 900px;
+    margin: 0 auto 48px;
+    padding: 28px 32px;
+    border: 1px solid rgba(124, 131, 255, 0.2);
+    border-radius: 16px;
+}
+
+.prereq-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.prereq-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--accent, #7c83ff);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.prereq-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 4px;
+}
+
+.prereq-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.prereq-methods {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.prereq-method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    text-align: center;
+    transition: border-color 0.2s ease;
+}
+
+.prereq-method:hover {
+    border-color: rgba(124, 131, 255, 0.3);
+}
+
+.method-icon {
+    width: 22px;
+    height: 22px;
+    color: rgba(124, 131, 255, 0.8);
+}
+
+.method-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.method-detail {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.3;
+}
+
 /* How It Works */
 .steps-container {
     display: flex;
@@ -686,6 +764,39 @@ a {
     
     .features-grid {
         grid-template-columns: 1fr;
+    }
+
+    .connection-prereq {
+        padding: 20px 18px;
+        margin-bottom: 32px;
+    }
+
+    .prereq-header {
+        gap: 12px;
+    }
+
+    .prereq-title {
+        font-size: 1rem;
+    }
+
+    .prereq-methods {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .prereq-method {
+        flex-direction: row;
+        padding: 12px 14px;
+        gap: 10px;
+        text-align: left;
+    }
+
+    .method-icon {
+        flex-shrink: 0;
+    }
+
+    .method-name {
+        min-width: 110px;
     }
     
     .steps-container {
