@@ -37,6 +37,10 @@ const NETWORK_ONLY_PREFIXES = [
     '/info',
     '/qr',
     '/ws',
+    '/pin-check',
+    '/upload-offset',
+    '/health',
+    '/heartbeat',
 ];
 
 // ─── Install: Pre-cache static assets ─────────────────────────────────────

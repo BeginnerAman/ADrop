@@ -21,6 +21,7 @@
     let pwaInstallPrompt = null;     // Deferred PWA install prompt
     let wsReconnectTimer = null;     // Auto-reconnect countdown timer
     let wsReconnectCountdown = 0;
+    let wsReconnectAttempts = 0;     // Exponential backoff attempt counter
 
     // V2 Phase 4: Beat All Competition state
 
@@ -218,28 +219,7 @@
         }
     }
 
-    async function shareLocalPath(filePath) {
-        /**
-         * Register a local file for direct-path sharing via /share-local.
-         * No upload, no copy — the server streams from the original location.
-         */
-        try {
-            const res = await fetch('/share-local', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: filePath }),
-            });
-            if (res.ok) {
-                loadFileList();
-                loadTransferHistory();
-            } else {
-                const data = await res.json();
-                console.error('share-local failed:', data.detail);
-            }
-        } catch (e) {
-            console.error('share-local error:', e);
-        }
-    }
+    // shareLocalPath removed — was dead code (Issue #26)
 
     function processNextUpload() {
         if (uploadQueue.length === 0) {
@@ -264,163 +244,12 @@
         });
     }
 
-    function uploadFile(file, onComplete, onError) {
-        const progressSection = document.getElementById('progress-section');
-        const progressFilename = document.getElementById('progress-filename');
-        const progressPercent = document.getElementById('progress-percent');
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const progressTransferred = document.getElementById('progress-transferred');
-        const progressSpeed = document.getElementById('progress-speed');
-        const progressEta = document.getElementById('progress-eta');
-
-        if (progressSection) progressSection.classList.add('active');
-        
-        const queueHint = uploadQueue.length > 0 ? ` (+${uploadQueue.length} more)` : '';
-        if (progressFilename) progressFilename.textContent = file.name + queueHint;
-        
-        if (progressBarFill) {
-            progressBarFill.style.width = '0%';
-            progressBarFill.classList.remove('complete', 'error');
-        }
-        if (progressSection) progressSection.classList.remove('complete', 'error');
-
-        // V2: requestAnimationFrame-based progress rendering (60fps, zero jank)
-        let pendingUpdate = null;
-        let rafScheduled = false;
-
-        function applyProgressUpdate(update) {
-            if (progressBarFill) progressBarFill.style.width = update.percent + '%';
-            if (progressPercent) progressPercent.textContent = Math.round(update.percent) + '%';
-            if (progressTransferred) progressTransferred.textContent = formatBytes(update.transferred) + ' / ' + formatBytes(update.total);
-            if (update.speed !== undefined && progressSpeed) progressSpeed.textContent = formatBytes(update.speed) + '/s';
-            if (update.eta !== undefined && progressEta) progressEta.textContent = formatDuration(update.eta) + ' remaining';
-        }
-
-        function scheduleProgressUpdate(update) {
-            pendingUpdate = update;
-            if (!rafScheduled) {
-                rafScheduled = true;
-                requestAnimationFrame(() => {
-                    if (pendingUpdate) applyProgressUpdate(pendingUpdate);
-                    rafScheduled = false;
-                });
-            }
-        }
-
-        function handleComplete() {
-            if (progressBarFill) {
-                progressBarFill.style.width = '100%';
-                progressBarFill.classList.add('complete');
-            }
-            if (progressSection) progressSection.classList.add('complete');
-            if (progressSpeed) progressSpeed.textContent = 'Complete';
-            if (progressEta) progressEta.textContent = '✓';
-
-            // V2 Phase 3: Completion sound + haptic feedback (Task 11)
-            playCompletionSound();
-            if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
-            
-            setTimeout(() => {
-                loadFileList();
-                loadTransferHistory(); // Refresh history dashboard after upload
-                if (onComplete) onComplete();
-            }, 500);
-        }
-
-        function handleError() {
-            if (progressBarFill) progressBarFill.classList.add('error');
-            if (progressSection) progressSection.classList.add('error');
-            if (progressSpeed) progressSpeed.textContent = 'Failed';
-            if (progressEta) progressEta.textContent = 'Upload error';
-            if (onError) onError();
-        }
-
-        // V2: Try Web Worker upload first (offloads XHR to background thread)
-        if (uploadWorker) {
-            uploadWorker.onmessage = function(e) {
-                const msg = e.data;
-                if (msg.type === 'progress') {
-                    scheduleProgressUpdate({
-                        percent: msg.percent,
-                        transferred: msg.transferred,
-                        total: msg.total,
-                        speed: msg.speed,
-                        eta: msg.eta
-                    });
-                } else if (msg.type === 'complete') {
-                    handleComplete();
-                } else if (msg.type === 'error') {
-                    console.error('Worker upload error:', msg.message);
-                    handleError();
-                }
-            };
-
-            uploadWorker.onerror = function(err) {
-                console.error('Worker error:', err);
-                handleError();
-            };
-
-            uploadWorker.postMessage({ type: 'upload', file: file, url: '/upload' });
-            return;
-        }
-
-        // Fallback: XHR upload on main thread (V1 behavior with rAF optimization)
-        const xhr = new XMLHttpRequest();
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        let lastLoaded = 0;
-        let lastTime = Date.now();
-        let speeds = []; 
-        
-        xhr.upload.addEventListener('progress', function(e) {
-            if (e.lengthComputable) {
-                const percent = (e.loaded / e.total) * 100;
-
-                const now = Date.now();
-                const timeDelta = (now - lastTime) / 1000;
-                if (timeDelta > 0.1) {
-                    const byteDelta = e.loaded - lastLoaded;
-                    const speed = byteDelta / timeDelta;
-                    speeds.push(speed);
-                    if (speeds.length > 5) speeds.shift();
-                    lastLoaded = e.loaded;
-                    lastTime = now;
-                }
-
-                const avgSpeed = speeds.length > 0 ? speeds.reduce((a,b) => a+b, 0) / speeds.length : 0;
-                const remaining = e.total - e.loaded;
-                const eta = avgSpeed > 0 ? remaining / avgSpeed : 0;
-
-                scheduleProgressUpdate({
-                    percent: percent,
-                    transferred: e.loaded,
-                    total: e.total,
-                    speed: avgSpeed,
-                    eta: eta
-                });
-            }
-        });
-        
-        xhr.addEventListener('load', function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                handleComplete();
-            } else {
-                handleError();
-            }
-        });
-        
-        xhr.addEventListener('error', handleError);
-        xhr.addEventListener('abort', handleError);
-        
-        xhr.open('POST', '/upload');
-        xhr.send(formData);
-    }
+    // uploadFile removed — was dead code, processNextUpload uses uploadFileWithResume (Issue #26+27)
 
     async function loadFileList() {
         const fileListElement = document.getElementById('file-list');
         try {
-            const response = await fetch('/files');
+            const response = await fetch('/files', { signal: AbortSignal.timeout(5000) });
             if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
             const files = data.files || [];
@@ -623,6 +452,10 @@
         // Set total height for scroll
         const totalHeight = count * VIRTUAL_ITEM_HEIGHT;
 
+        // DOM pool state for virtual scroll (Issue #12 fix)
+        let prevStartIndex = -1;
+        let prevEndIndex = -1;
+
         function renderVisibleItems() {
             const scrollTop = fileListElement.scrollTop;
             const viewportHeight = fileListElement.clientHeight;
@@ -630,27 +463,30 @@
             const startIndex = Math.max(0, Math.floor(scrollTop / VIRTUAL_ITEM_HEIGHT) - VIRTUAL_BUFFER);
             const endIndex = Math.min(count, Math.ceil((scrollTop + viewportHeight) / VIRTUAL_ITEM_HEIGHT) + VIRTUAL_BUFFER);
 
-            const fragment = document.createDocumentFragment();
+            // Skip re-render if visible range hasn't changed
+            if (startIndex === prevStartIndex && endIndex === prevEndIndex) return;
+            prevStartIndex = startIndex;
+            prevEndIndex = endIndex;
 
             // Top spacer
             const topSpacer = document.createElement('li');
             topSpacer.className = 'virtual-spacer-top';
             topSpacer.style.height = (startIndex * VIRTUAL_ITEM_HEIGHT) + 'px';
-            fragment.appendChild(topSpacer);
 
             // Visible items
+            const nodes = [topSpacer];
             for (let i = startIndex; i < endIndex; i++) {
-                fragment.appendChild(createFileItem(files[i]));
+                nodes.push(createFileItem(files[i]));
             }
 
             // Bottom spacer
             const bottomSpacer = document.createElement('li');
             bottomSpacer.className = 'virtual-spacer-bottom';
             bottomSpacer.style.height = ((count - endIndex) * VIRTUAL_ITEM_HEIGHT) + 'px';
-            fragment.appendChild(bottomSpacer);
+            nodes.push(bottomSpacer);
 
-            fileListElement.innerHTML = '';
-            fileListElement.appendChild(fragment);
+            // Atomic DOM swap — single reflow instead of innerHTML='' thrashing
+            fileListElement.replaceChildren(...nodes);
         }
 
         // Initial render
@@ -944,9 +780,14 @@
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="15" y1="9" y2="9"/><line x1="9" x2="15" y1="13" y2="13"/><line x1="9" x2="11" y1="17" y2="17"/></svg>
                 </div>
                 <h3>Preview not available</h3>
-                <p>.${ext} files can't be previewed in browser. Use the Download button to save the file.</p>
+                <p></p>
             </div>
         `;
+        // Set extension text safely to prevent DOM XSS
+        const p = body.querySelector('.preview-unsupported p');
+        if (p) {
+            p.textContent = `.${ext} files can't be previewed in browser. Use the Download button to save the file.`;
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -1007,8 +848,9 @@
                 showConfirm(`Delete ${selectedFiles.size} selected file(s)?`, async () => {
                     const toDelete = [...selectedFiles];
                     for (const name of toDelete) {
-                        await deleteFile(name);
+                        await deleteFile(name, true);  // Skip per-file reload
                     }
+                    loadFileList();  // Single reload after all deletes
                     selectedFiles.clear();
                     isMultiSelectMode = false;
                     const fileList = document.getElementById('file-list');
@@ -1138,8 +980,110 @@
     }
 
     // -----------------------------------------------------------------------
+    // Server Unreachable / IP Changed Recovery Modal
+    // -----------------------------------------------------------------------
+
+    function showServerUnreachableModal() {
+        // Don't show duplicate
+        if (document.getElementById('server-unreachable-modal')) return;
+
+        const modal = document.createElement('div');
+        modal.id = 'server-unreachable-modal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content server-unreachable-content">
+                <div class="server-unreachable-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+                        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+                        <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+                        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                        <line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>
+                </div>
+                <h3 class="modal-title">Server Unreachable</h3>
+                <p class="modal-message">
+                    Connection lost after multiple retries.<br>
+                    Your hotspot IP address may have changed.
+                </p>
+                <p class="server-unreachable-hint">
+                    Check the ADrop window on your PC for the current address, then re-scan the QR code or enter the new URL.
+                </p>
+                <div class="modal-actions server-unreachable-actions">
+                    <button class="secondary-btn" id="unreachable-retry-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M3.5 12a9 9 0 0 1 15-6.7L21.5 8"/><path d="M2.5 22v-6h6"/><path d="M20.5 12a9 9 0 0 1-15 6.7L2.5 16"/></svg>
+                        Retry Connection
+                    </button>
+                    <button class="secondary-btn" id="unreachable-refresh-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                        Open New Address
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Trigger animation on next frame
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        // Retry button — reset backoff and reconnect
+        document.getElementById('unreachable-retry-btn').addEventListener('click', function() {
+            hideServerUnreachableModal();
+            wsReconnectAttempts = 0;
+            initWebSocket();
+            checkConnection();
+        });
+
+        // Open new address — prompt user for new IP or reload
+        document.getElementById('unreachable-refresh-btn').addEventListener('click', function() {
+            const currentPort = window.location.port || '8080';
+            const newAddr = prompt(
+                'Enter the new server address shown on your PC:',
+                'http://192.168.' + '\u2026' + ':' + currentPort
+            );
+            if (newAddr && newAddr.trim()) {
+                let url = newAddr.trim();
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'http://' + url;
+                }
+                window.location.href = url;
+            }
+        });
+    }
+
+    function hideServerUnreachableModal() {
+        const modal = document.getElementById('server-unreachable-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 300); // Wait for fade-out transition
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // V2 Phase 3: PWA Service Worker Registration + Install Prompt (Tasks 2, 14)
     // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // Desktop Heartbeat — keeps server alive while browser tab is open
+    // -----------------------------------------------------------------------
+
+    function startDesktopHeartbeat() {
+        // Only send heartbeats from the desktop browser (localhost),
+        // not from mobile PWA clients connected over hotspot IP
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (!isLocalhost) return;
+
+        setInterval(function() {
+            fetch('/heartbeat', {
+                method: 'POST',
+                signal: AbortSignal.timeout(2000)
+            }).catch(function() {
+                // Server unreachable — heartbeat silently fails
+            });
+        }, 2000);
+    }
 
     function initPWA() {
         // Register Service Worker
@@ -1180,7 +1124,7 @@
         });
     }
 
-    async function deleteFile(filename) {
+    async function deleteFile(filename, skipReload = false) {
         // V2: Optimistic UI — remove immediately, restore on error
         const fileListElement = document.getElementById('file-list');
         let removedItem = null;
@@ -1216,18 +1160,18 @@
                 let totalSize = 0;
                 cachedFiles.forEach(f => { totalSize += f.size || 0; });
                 if (fileTotalSize) fileTotalSize.innerHTML = `<span>${formatBytes(totalSize)}</span> total`;
-                // Reload file list to fix virtual scroll desync
-                loadFileList();
+                // Reload file list to fix virtual scroll desync (skip in bulk mode)
+                if (!skipReload) loadFileList();
             } else {
                 // Restore on error
                 const data = await response.json();
                 showNotice('Error deleting file: ' + (data.detail || 'unknown error'));
-                loadFileList(); // Reload to restore state
+                if (!skipReload) loadFileList(); // Reload to restore state
             }
         } catch (err) {
             console.error('Delete failed:', err);
             showNotice('Failed to connect to server to delete file.');
-            loadFileList(); // Reload to restore state
+            if (!skipReload) loadFileList(); // Reload to restore state
         }
     }
 
@@ -1235,6 +1179,8 @@
      * Show a non-blocking notice modal (replaces alert()).
      * Auto-dismisses after 3 seconds or on click.
      */
+    let noticeTimeoutId = null;  // Issue #22 fix: track timeout to prevent premature dismissal
+
     function showNotice(message) {
         let overlay = document.getElementById('notice-overlay');
         if (!overlay) {
@@ -1268,8 +1214,9 @@
         const btn = overlay.querySelector('.notice-ok-btn');
         if (btn) btn.onclick = dismiss;
         overlay.onclick = (e) => { if (e.target === overlay) dismiss(); };
-        // Auto-dismiss after 4 seconds
-        setTimeout(dismiss, 4000);
+        // Clear previous timeout to prevent premature dismissal of new notices
+        clearTimeout(noticeTimeoutId);
+        noticeTimeoutId = setTimeout(dismiss, 4000);
     }
 
     function showConfirm(message, onConfirm, titleText = "Confirm Action", confirmBtnText = "Confirm") {
@@ -1325,7 +1272,7 @@
         const connectionUrlText = document.getElementById('connection-url-text');
 
         try {
-            const response = await fetch('/info');
+            const response = await fetch('/info', { signal: AbortSignal.timeout(5000) });
             if (response.ok) {
                 const data = await response.json();
                 if (statusDot) {
@@ -1735,7 +1682,7 @@
             if (transfersRes.ok) {
                 const transfersData = await transfersRes.json();
                 const list = transfersData.transfers || [];
-                const running = list.filter(t => t.status === 'running' || t.status === 'active');
+                const running = list.filter(t => t.status === 'uploading' || t.status === 'running' || t.status === 'active');
                 if (termActive) {
                     termActive.textContent = running.length + (running.length === 1 ? ' Stream' : ' Streams');
                     termActive.style.color = running.length > 0 ? '#fbbf24' : '';
@@ -1751,16 +1698,32 @@
     }
 
     function initWebSocket() {
+        const MAX_WS_RETRIES = 10;
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}/ws`;
         let ws;
+
+        // Stop retrying after max attempts — show recovery modal
+        if (wsReconnectAttempts >= MAX_WS_RETRIES) {
+            isWsConnected = false;
+            const statusLabel = document.getElementById('term-ws');
+            if (statusLabel) {
+                statusLabel.textContent = 'UNREACHABLE';
+                statusLabel.style.color = '#ff5f56';
+            }
+            hideReconnectOverlay();
+            showServerUnreachableModal();
+            return;
+        }
 
         try {
             ws = new WebSocket(wsUrl);
 
             ws.onopen = function() {
                 isWsConnected = true;
-                hideReconnectOverlay(); // V2 Phase 3: hide reconnect overlay on connect
+                wsReconnectAttempts = 0; // Reset on successful connection
+                hideReconnectOverlay();
+                hideServerUnreachableModal();
                 const statusLabel = document.getElementById('term-ws');
                 if (statusLabel) {
                     statusLabel.textContent = 'CONNECTED';
@@ -1796,10 +1759,11 @@
                     statusLabel.textContent = 'DISCONNECTED';
                     statusLabel.style.color = '#ff5f56';
                 }
-                // V2 Phase 3: Show auto-reconnect countdown, then reconnect
-                const RECONNECT_DELAY = 3;
-                showReconnectOverlay(RECONNECT_DELAY);
-                setTimeout(initWebSocket, RECONNECT_DELAY * 1000);
+                // Exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (capped)
+                wsReconnectAttempts++;
+                const delay = Math.min(Math.pow(2, wsReconnectAttempts - 1), 30);
+                showReconnectOverlay(delay);
+                setTimeout(initWebSocket, delay * 1000);
             };
 
             ws.onerror = function() {
@@ -1807,8 +1771,10 @@
             };
         } catch (err) {
             isWsConnected = false;
-            showReconnectOverlay(5);
-            setTimeout(initWebSocket, 5000);
+            wsReconnectAttempts++;
+            const delay = Math.min(Math.pow(2, wsReconnectAttempts - 1), 30);
+            showReconnectOverlay(delay);
+            setTimeout(initWebSocket, delay * 1000);
         }
     }
 
@@ -1842,6 +1808,7 @@
         initDownloadAll();
         initCopyUrlBtn();
         initPWA();
+        startDesktopHeartbeat();
 
         // V2 Phase 4: New feature initializers
 
@@ -1923,6 +1890,34 @@
             loadFileList();
             checkConnection();
             loadSharedText();
+        });
+
+        // V2: Reliable PWA resume detection via visibilitychange
+        // On mobile standalone PWAs, visibilitychange fires more reliably than focus
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // Quick health probe to check if server is still alive
+                fetch('/health', { signal: AbortSignal.timeout(3000) })
+                    .then(function(r) {
+                        if (r.ok && !isWsConnected) {
+                            // Server is alive but WS is dead — reset backoff and reconnect
+                            wsReconnectAttempts = 0;
+                            hideServerUnreachableModal();
+                            initWebSocket();
+                        }
+                        // Also refresh data
+                        loadFileList();
+                        checkConnection();
+                        loadSharedText();
+                    })
+                    .catch(function() {
+                        // Server unreachable — show recovery modal if retries exhausted
+                        checkConnection();
+                        if (wsReconnectAttempts >= 10) {
+                            showServerUnreachableModal();
+                        }
+                    });
+            }
         });
 
         // V2 Phase 3: Close preview on browser back button
@@ -2047,11 +2042,13 @@
     async function uploadFileWithResume(file, onComplete, onError) {
         // Check if server already has partial data for this file
         let offset = 0;
+        let resumeTransferId = null;
         try {
             const offsetRes = await fetch('/upload-offset?filename=' + encodeURIComponent(file.name));
             if (offsetRes.ok) {
                 const offsetData = await offsetRes.json();
                 offset = offsetData.offset || 0;
+                resumeTransferId = offsetData.transfer_id || null;
             }
         } catch (e) {
             offset = 0; // If check fails, start from beginning
@@ -2074,8 +2071,22 @@
         if (progressSection) progressSection.classList.add('active');
         const queueHint = uploadQueue.length > 0 ? ` (+${uploadQueue.length} more)` : '';
         if (progressFilename) progressFilename.textContent = file.name + (offset > 0 ? ' (resuming)' : '') + queueHint;
-        if (progressBarFill) { progressBarFill.style.width = '0%'; progressBarFill.classList.remove('complete','error'); }
-        if (progressSection) progressSection.classList.remove('complete','error');
+
+        // For resume uploads, show the offset immediately since it's meaningful state.
+        // For fresh uploads (offset === 0), defer the 0% reset to the first progress tick
+        // to avoid the jarring "100% Complete" → "0% / 0 B" flash between queued files.
+        let progressInitialized = offset > 0;
+        if (offset > 0) {
+            const initialPercent = (offset / file.size) * 100;
+            if (progressBarFill) {
+                progressBarFill.style.width = Math.round(initialPercent) + '%';
+                progressBarFill.classList.remove('complete', 'error');
+            }
+            if (progressPercent) progressPercent.textContent = Math.round(initialPercent) + '%';
+            if (progressTransferred) progressTransferred.textContent = formatBytes(offset) + ' / ' + formatBytes(file.size);
+        }
+        if (progressBarFill) progressBarFill.classList.remove('complete', 'error');
+        if (progressSection) progressSection.classList.remove('complete', 'error');
 
         // Slice the file from the offset
         const blob = offset > 0 ? file.slice(offset) : file;
@@ -2085,8 +2096,16 @@
         let lastTime = Date.now();
         let speeds = [];
 
+        let pendingProgress = null;
+        let rafScheduled = false;
+
         function handleComplete() {
+            // Cancel any pending progress animation frame to prevent 100% → 99% visual regression
+            pendingProgress = null;
+            rafScheduled = false;
             if (progressBarFill) { progressBarFill.style.width = '100%'; progressBarFill.classList.add('complete'); }
+            if (progressPercent) progressPercent.textContent = '100%';
+            if (progressTransferred) progressTransferred.textContent = formatBytes(total) + ' / ' + formatBytes(total);
             if (progressSection) progressSection.classList.add('complete');
             if (progressSpeed) progressSpeed.textContent = 'Complete';
             if (progressEta) progressEta.textContent = '✓';
@@ -2103,11 +2122,10 @@
             if (progressBarFill) progressBarFill.classList.add('error');
             if (progressSection) progressSection.classList.add('error');
             if (progressSpeed) progressSpeed.textContent = 'Failed';
+            // Reload transfer history so the spinner transitions to the error icon
+            setTimeout(() => { loadTransferHistory(); }, 300);
             if (onError) onError();
         }
-
-        let pendingProgress = null;
-        let rafScheduled = false;
 
         // Use XHR for progress events (fetch doesn't support upload progress yet)
         const xhr = new XMLHttpRequest();
@@ -2132,8 +2150,16 @@
                     rafScheduled = true;
                     requestAnimationFrame(() => {
                         if (pendingProgress) {
-                            if (progressBarFill) progressBarFill.style.width = pendingProgress.percent + '%';
-                            if (progressPercent) progressPercent.textContent = Math.round(pendingProgress.percent) + '%';
+                            // Deferred init: on the first progress tick for a fresh upload,
+                            // reset the UI from the previous file's "Complete" state.
+                            if (!progressInitialized) {
+                                progressInitialized = true;
+                                if (progressSpeed) progressSpeed.textContent = '--';
+                                if (progressEta) progressEta.textContent = '--';
+                            }
+                            const displayPercent = Math.round(pendingProgress.percent);
+                            if (progressBarFill) progressBarFill.style.width = displayPercent + '%';
+                            if (progressPercent) progressPercent.textContent = displayPercent + '%';
                             if (progressTransferred) progressTransferred.textContent = formatBytes(pendingProgress.loaded) + ' / ' + formatBytes(pendingProgress.total);
                             if (progressSpeed) progressSpeed.textContent = formatBytes(pendingProgress.avgSpeed) + '/s';
                             if (progressEta) progressEta.textContent = formatDuration(pendingProgress.eta) + ' remaining';
@@ -2152,8 +2178,11 @@
 
         const endpoint = offset > 0 ? '/upload/resume' : '/upload/raw';
         xhr.open('POST', endpoint);
-        xhr.setRequestHeader('X-Filename', file.name);
-        if (offset > 0) xhr.setRequestHeader('X-Offset', String(offset));
+        xhr.setRequestHeader('X-Filename', encodeURIComponent(file.name));
+        if (offset > 0) {
+            xhr.setRequestHeader('X-Offset', String(offset));
+            if (resumeTransferId) xhr.setRequestHeader('X-Transfer-Id', resumeTransferId);
+        }
         xhr.send(blob);
     }
 
@@ -2187,20 +2216,41 @@
 
         if (clearBtn) clearBtn.classList.remove('hidden');
 
+        // Deduplicate by filename: if multiple entries share the same filename,
+        // keep only the most recent one (by updated_at) to prevent stale ghost spinners.
+        const seen = new Map();
+        transfers.forEach(t => {
+            const key = t.filename;
+            const existing = seen.get(key);
+            if (!existing || (t.updated_at || 0) > (existing.updated_at || 0)) {
+                seen.set(key, t);
+            }
+        });
+        const dedupedTransfers = Array.from(seen.values());
+        // Re-sort by updated_at descending (most recent first)
+        dedupedTransfers.sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0));
+
         const fragment = document.createDocumentFragment();
-        transfers.slice(0, 20).forEach(t => {  // Show latest 20
+        dedupedTransfers.slice(0, 20).forEach(t => {  // Show latest 20
             const li = document.createElement('li');
             li.className = 'history-item';
             
             const checkSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
             const crossSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
             const spinSvg = `<svg class="preview-spinner" style="width:12px;height:12px;border-width:2px;" viewBox="0 0 24 24"></svg>`;
+            const pauseSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="10" y2="18"/><line x1="14" y1="6" x2="14" y2="18"/></svg>`;
 
-            const statusIcon = t.status === 'completed' 
-                ? `<span class="status-badge success" title="Completed">${checkSvg}</span>`
-                : t.status === 'failed'
-                ? `<span class="status-badge error" title="Failed">${crossSvg}</span>`
-                : `<span class="status-badge progress" title="In Progress">${spinSvg}</span>`;
+            let statusIcon;
+            if (t.status === 'completed') {
+                statusIcon = `<span class="status-badge success" title="Completed">${checkSvg}</span>`;
+            } else if (t.status === 'failed') {
+                statusIcon = `<span class="status-badge error" title="Failed">${crossSvg}</span>`;
+            } else if (t.status === 'uploading') {
+                statusIcon = `<span class="status-badge progress" title="Uploading">${spinSvg}</span>`;
+            } else {
+                // Unknown/stale status — show static pause icon, never a spinner
+                statusIcon = `<span class="status-badge error" title="${t.status || 'Unknown'}">${pauseSvg}</span>`;
+            }
 
             const speed = t.speed > 0 ? formatBytes(t.speed) + '/s' : '--';
             const size = t.total_size > 0 ? formatBytes(t.total_size) : formatBytes(t.transferred);
@@ -2211,7 +2261,7 @@
             li.innerHTML = `
                 ${statusIcon}
                 <div class="history-info">
-                    <span class="history-name" title="${t.filename}">${t.filename}</span>
+                    <span class="history-name"></span>
                     <span class="history-meta">${size} · ${speed}</span>
                 </div>
                 <span class="history-time">${elapsed}</span>
@@ -2219,6 +2269,12 @@
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             `;
+            // Set filename safely via textContent to prevent XSS
+            const nameSpan = li.querySelector('.history-name');
+            if (nameSpan) {
+                nameSpan.textContent = t.filename;
+                nameSpan.title = t.filename;
+            }
 
             const deleteBtn = li.querySelector('.history-delete-btn');
             if (deleteBtn) {
