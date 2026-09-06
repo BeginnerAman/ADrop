@@ -5,7 +5,7 @@
 
   **Ultra-fast offline local file transfer for Windows - up to 150+ MB/s over WiFi.**
 
-  [![Version](https://img.shields.io/badge/version-v2.0.0-blue.svg?style=for-the-badge)](https://github.com/BeginnerAman/ADrop/releases)
+  [![Version](https://img.shields.io/badge/version-v3.0.0-blue.svg?style=for-the-badge)](https://github.com/BeginnerAman/ADrop/releases)
   [![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg?style=for-the-badge&logo=windows)](https://github.com/BeginnerAman/ADrop)
   [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
   [![GitHub stars](https://img.shields.io/github/stars/BeginnerAman/ADrop.svg?style=for-the-badge&logo=github)](https://github.com/BeginnerAman/ADrop/stargazers)
