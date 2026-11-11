@@ -1,16 +1,17 @@
 /**
- * sw.js — ADrop V2 Service Worker
+ * sw.js — ADrop V3 Service Worker
  *
- * Provides offline capability and fast cache-first loading for static assets.
+ * Provides offline capability and fast loading for static assets.
  * Does NOT cache file uploads/downloads (those must always hit the server).
  *
  * Cache Strategy:
- *  - Static assets (HTML, CSS, JS, icons): Cache-first with network fallback
+ *  - Navigation (/): Network-first with cache fallback
+ *  - Static assets (CSS, JS, icons): Cache-first with network revalidation
  *  - API routes (/files, /upload, /download-all, etc.): Network-only (never cache)
  *  - Offline fallback: Shows a minimal offline notice if network fails for navigation
  */
 
-const CACHE_NAME = 'adrop-v2-cache-v1';
+const CACHE_NAME = 'adrop-v3-cache-v3.1.0';
 
 // Static assets to cache on install
 const PRECACHE_ASSETS = [
@@ -85,6 +86,29 @@ self.addEventListener('fetch', (event) => {
     const isNetworkOnly = NETWORK_ONLY_PREFIXES.some(prefix => pathname.startsWith(prefix));
     if (isNetworkOnly) {
         // Network-only: just pass through
+        return;
+    }
+
+    // Navigation / HTML page: Network-first, fallback to cache, then offline fallback
+    if (event.request.mode === 'navigate' || pathname === '/') {
+        event.respondWith(
+            fetch(event.request).then((networkResponse) => {
+                if (networkResponse && networkResponse.status === 200) {
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+                }
+                return networkResponse;
+            }).catch(() => {
+                return caches.match(event.request).then((cachedResponse) => {
+                    if (cachedResponse) return cachedResponse;
+                    return new Response(
+                        '<html><body style="font-family:sans-serif;text-align:center;padding:60px;background:#0a0a1a;color:#fff">' +
+                        '<h1>ADrop</h1><p>You are offline. Please connect to the local network.</p></body></html>',
+                        { headers: { 'Content-Type': 'text/html' } }
+                    );
+                });
+            })
+        );
         return;
     }
 
