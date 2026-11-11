@@ -1287,6 +1287,10 @@
                 if (connectionUrlText && data.connection_url) {
                     connectionUrlText.textContent = data.connection_url;
                 }
+                const footerText = document.getElementById('footer-text');
+                if (footerText && data.version) {
+                    footerText.textContent = 'ADrop v' + data.version + ' \u00B7 Offline Ready';
+                }
             } else {
                 throw new Error('Not ok');
             }
